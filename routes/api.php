@@ -14,12 +14,15 @@ use App\Http\Controllers\{
     FeeController,
     DashboardController
 };
+use App\Http\Controllers\FeeReceiptController;
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
 */
+  // Preview receipt (browser view)
+    Route::get('/fees/{id}/receipt/preview', [FeeReceiptController::class, 'previewReceipt']);
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index']);
@@ -61,4 +64,19 @@ Route::get('/health', function () {
         'message' => 'Student Management API is running',
         'timestamp' => now()
     ]);
+});
+
+// Fee Receipt Routes
+Route::middleware('auth:sanctum')->group(function () {
+    // Generate and download receipt
+    Route::get('/fees/{id}/receipt', [FeeReceiptController::class, 'generateReceipt']);
+    
+  
+    
+    // Get receipt data (JSON)
+    Route::get('/fees/{id}/receipt/data', [FeeReceiptController::class, 'getReceiptData']);
+    
+    // Record payment and generate receipt
+    Route::post('/fees/{id}/payment', [FeeReceiptController::class, 'recordPaymentAndGenerateReceipt'])
+        ->middleware('role:teacher,admin');
 });
